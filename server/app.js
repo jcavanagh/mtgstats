@@ -13,8 +13,11 @@ app.use(bodyParser());
 var wiz = require('./data/wizards/index.js');
 
 app.get('/data/wizards', function(req, res, next) {
-    wiz.get(function(results) {
-        res.send(results);
+    wiz.get(function(err, results) {
+        res.send({
+            error: err,
+            data: results
+        });
     });
 });
 
