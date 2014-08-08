@@ -1,16 +1,131 @@
-var req = require('request');
+var fs = require('fs'),
+    nconf = require('nconf'),
+    req = require('request'),
+    vm = require('vm');
+
+//Nconf setup
+nconf.file('config.json');
+
+//Wizards "security" garbage
+var WizSec = {};
+vm.runInNewContext(fs.readFileSync('wizards-security.js'), WizSec);
 
 //Wizards requests
-var urlbase = 'http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistory/',
-    dci = '1202386509',
-    //Matches - 1: event ID, 2: Event description, 3: Event location
-    events = /data-summarykey="(\d+)"[\s\S]+?HistoryPanelHeaderLabel Description">(.+?)<[\s\S]+?HistoryPanelHeaderLabel Location">(?:<a.+?>)?(.+?)</g;
+var authEncryptUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/GetEncryptValues',
+    authUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/Login',
+    eventsUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistory/',
+    eventDetailUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetEventSummary/',
+    dciNumber = nconf.get('dciNumber'),
+    dciPassword = nconf.get('dciPassword'),
+    eventsExp = new RegExp(
+        //Event ID
+        'data-summarykey="(\\d+)"[\\s\\S]+?' +
+        //Event Description
+        'HistoryPanelHeaderLabel Description">(.+?)<[\\s\\S]+?' +
+        //Event Location
+        'HistoryPanelHeaderLabel Location">(?:<a.+?>)?(.+?)<',
+        'g'
+    ),
+    eventDetailExp = new RegExp(
+        'EventType">.+?\\/b>(.+?)<[\\s\\S]+?'
+    ),
+    eventMatchDetailExp = new RegExp(
+        '',
+        'g'
+    );
 
-req.post(urlbase + dci, function(error, resp, body) {
-    var data = JSON.parse(body).Data[1].Value,
-        arr;
+function parseEvents() {
+    //Get events
+    req.post(eventsUrl + dciNumber, function(error, resp, body) {
+        var eventData = JSON.parse(body).Data[1].Value,
+            events = [],
+            arr;
 
-    while((arr = events.exec(data)) !== null) {
-        console.log(arr[1], arr[2], arr[3]);
-    }
+        while((arr = eventsExp.exec(eventData)) !== null) {
+            events.push({
+                id: arr[1],
+                description: arr[2],
+                location: arr[3]
+            });
+        }
+
+        //Get event details
+        // for(var evt in events) {
+            var evt = events[0];
+            req.post(eventDetailUrl + evt.id, function(error, resp, body) {
+                console.log(body);
+                var myEvt = evt,
+                    eventDetailData = JSON.parse(body).Data.Value;
+
+                //Parse event details
+                arr = eventDetailExp.exec(eventDetailData);
+
+                myEvt.geolocation = '';
+                myEvt.results = {
+                    type: arr[0],
+                    pointsMultiplier: '',
+                    players: '',
+                    format: '',
+                    place: '',
+                    seasonalPoints: '',
+                    lifetimePoints: '',
+                    matches: []
+                };
+
+                //Parse matches
+                while((arr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
+                    myEvt.results.matches.push({
+                        result: '',
+                        points: '',
+                        opponent: '',
+                    });
+                }
+            });
+        // }
+    });
+}
+
+//Authenticate and parse events
+req.post(authEncryptUrl, function(error, resp, body) {
+    var cryptoData = JSON.parse(body).ModalData.ResponseData;
+
+    //Encrypt auth like their servers want it
+    WizSec.setMaxDigits(131);
+
+    var keyPair = new WizSec.RSAKeyPair(cryptoData[0], '', cryptoData[1]),
+        username = new Buffer(dciNumber).toString('base64'),
+        password = new Buffer(dciPassword).toString('base64'),
+        encStr = WizSec.encryptedString(keyPair, cryptoData[2] + '\\' + username + '\\' + password),
+        authForm = {
+            IsModalResult: true,
+            Result: 'custom',
+            ModalContent: null,
+            RedirectUrl: null,
+            ReloadPageAfterModal: false,
+            ModalData: {
+                Parameters: {},
+                HelperFuncParameters: null,
+                ResponseData: cryptoData
+            },
+            CloseFunction: null,
+            HelperFunction: null,
+            Parameters: {
+                encrypted: encStr,
+                rememberMe: false
+            }
+        };
+
+    console.log(authForm);
+
+    //This thing wants form headers but a JSON body
+    req.post({
+        url: authUrl,
+        headers: {
+            'Content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+        },
+        body: JSON.stringify(authForm)
+    }, function(error, resp, body) {
+        console.log(resp.statusCode);
+        console.log(body);
+    });
 });
