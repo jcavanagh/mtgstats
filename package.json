@@ -18,7 +18,8 @@
     "clean-css-brunch": ">= 1.0 < 1.8",
     "auto-reload-brunch": ">= 1.0 < 1.8",
 
+    "nconf": "*",
     "request": "*",
-    "nconf": "*"
+    "tough-cookie": "*"
   }
 }

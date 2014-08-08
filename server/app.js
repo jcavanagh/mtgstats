@@ -1,6 +1,6 @@
 var fs = require('fs'),
     nconf = require('nconf'),
-    req = require('request'),
+    req = require('request').defaults({jar: true}),
     vm = require('vm');
 
 //Nconf setup
@@ -27,10 +27,19 @@ var authEncryptUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/GetE
         'g'
     ),
     eventDetailExp = new RegExp(
-        'EventType">.+?\\/b>(.+?)<[\\s\\S]+?'
+        'EventType">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
+        'EventMultiplier">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
+        'EventPlayers">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
+        'EventFormat">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
+        'EventLocation">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
+        'EventPlace">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
+        'Seasonal:<\\/b>([\\s\\S]+?)<[\\s\\S]+?' +
+        'Lifetime:<\\/b>([\\s\\S]+?)<'
     ),
     eventMatchDetailExp = new RegExp(
-        '',
+        'MatchResult">([\\s\\S]+?)<[\\s\\S]+?' +
+        'MatchPoints">([\\s\\S]+?)<[\\s\\S]+?' +
+        'MatchOpponent">([\\s\\S]+?)<',
         'g'
     );
 
@@ -50,38 +59,42 @@ function parseEvents() {
         }
 
         //Get event details
-        // for(var evt in events) {
+        for(var evt in events) {
             var evt = events[0];
             req.post(eventDetailUrl + evt.id, function(error, resp, body) {
-                console.log(body);
                 var myEvt = evt,
                     eventDetailData = JSON.parse(body).Data.Value;
 
                 //Parse event details
                 arr = eventDetailExp.exec(eventDetailData);
 
-                myEvt.geolocation = '';
-                myEvt.results = {
-                    type: arr[0],
-                    pointsMultiplier: '',
-                    players: '',
-                    format: '',
-                    place: '',
-                    seasonalPoints: '',
-                    lifetimePoints: '',
-                    matches: []
-                };
+                if(arr) {
+                    myEvt.geolocation = arr[5].trim();
+                    myEvt.results = {
+                        type: arr[1].trim(),
+                        pointsMultiplier: arr[2].trim(),
+                        players: arr[3].trim(),
+                        format: arr[4].trim(),
+                        place: arr[6].trim(),
+                        seasonalPoints: arr[7].trim(),
+                        lifetimePoints: arr[8].trim(),
+                        matches: []
+                    };
 
-                //Parse matches
-                while((arr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
-                    myEvt.results.matches.push({
-                        result: '',
-                        points: '',
-                        opponent: '',
-                    });
+                    //Parse matches
+                    while((arr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
+                        console.log(arr);
+                        myEvt.results.matches.push({
+                            result: arr[1].trim(),
+                            points: arr[2].trim(),
+                            opponent: arr[3].trim(),
+                        });
+                    }
                 }
+
+                console.log(myEvt);
             });
-        // }
+        }
     });
 }
 
@@ -115,8 +128,6 @@ req.post(authEncryptUrl, function(error, resp, body) {
             }
         };
 
-    console.log(authForm);
-
     //This thing wants form headers but a JSON body
     req.post({
         url: authUrl,
@@ -125,7 +136,7 @@ req.post(authEncryptUrl, function(error, resp, body) {
         },
         body: JSON.stringify(authForm)
     }, function(error, resp, body) {
-        console.log(resp.statusCode);
-        console.log(body);
+        //Authenticated, parse events
+        parseEvents();
     });
 });
