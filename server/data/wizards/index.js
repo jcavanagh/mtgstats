@@ -152,7 +152,7 @@ module.exports = {
             authenticate,
             parseEvents
         ], function(err, results) {
-            callback(results);
+            callback(results[1]);
         });
     }
 };

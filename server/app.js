@@ -14,7 +14,7 @@ var wiz = require('./data/wizards/index.js');
 
 app.get('/data/wizards', function(req, res, next) {
     wiz.get(function(results) {
-        console.log(results);
+        res.send(results);
     });
 });
 
