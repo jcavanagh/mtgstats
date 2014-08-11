@@ -17,7 +17,14 @@ var express = require('express'),
 var app = express();
 app.use(bodyParser());
 
-//App pieces
+app.set('view engine', 'jade');
+
+//App
+app.get('/', function(req, res, next) {
+    res.render('index');
+});
+
+//Data
 var wiz = require('data/wizards/index.js'),
     analytics = require('analytics/index.js');
 
@@ -39,6 +46,7 @@ app.get('/data/wizards/sync', function(req, res, next) {
     });
 });
 
+//Analytics
 app.get('/analytics/matchstats', function(req, res, next) {
     analytics.getAllMatchStats(function(err, stats) {
         res.send({

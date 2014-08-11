@@ -8,18 +8,12 @@
     "url": "https://github.com/jcavanagh/mtgstats"
   },
   "scripts": {
-    "start": "brunch watch --server",
-    "test": "brunch test"
+    "start": "node app.js"
   },
   "dependencies": {
-    "javascript-brunch": ">= 1.0 < 1.8",
-    "css-brunch": ">= 1.0 < 1.8",
-    "uglify-js-brunch": ">= 1.0 < 1.8",
-    "clean-css-brunch": ">= 1.0 < 1.8",
-    "auto-reload-brunch": ">= 1.0 < 1.8",
-
     "express": "*",
     "body-parser": "*",
+    "jade": "*",
 
     "async": "*",
     "mongoskin": "*",

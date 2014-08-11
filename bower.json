@@ -2,6 +2,9 @@
   "name": "mtgstats",
   "version": "0.0.1",
   "main": "public/app.js",
-  "dependencies": {},
+  "dependencies": {
+    "chartjs": "~0.2.0",
+    "ember": "~1.6.1"
+  },
   "overrides": {}
 }
