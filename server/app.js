@@ -3,7 +3,8 @@
 process.env.NODE_PATH = '.';
 require('module').Module._initPaths();
 
-var _ = require('underscore');
+//Global underscore
+GLOBAL._ = require('underscore');
 
 //Nconf setup
 var nconf = require('nconf');
@@ -17,7 +18,8 @@ var app = express();
 app.use(bodyParser());
 
 //App pieces
-var wiz = require('./data/wizards/index.js');
+var wiz = require('data/wizards/index.js'),
+    analytics = require('analytics/index.js');
 
 app.get('/data/wizards', function(req, res, next) {
     wiz.get(function(err, results) {
@@ -33,6 +35,15 @@ app.get('/data/wizards/sync', function(req, res, next) {
         res.send({
             error: err,
             data: results
+        });
+    });
+});
+
+app.get('/analytics/matchstats', function(req, res, next) {
+    analytics.getAllMatchStats(function(err, stats) {
+        res.send({
+            error: err,
+            data: stats
         });
     });
 });
