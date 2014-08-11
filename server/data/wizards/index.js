@@ -32,7 +32,6 @@ var authEncryptUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/GetE
         'EventFormat">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
         'EventLocation">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
         'EventPlace">[\\s\\S]+?\\/b>(.+?)<[\\s\\S]+?' +
-        'Seasonal:<\\/b>([\\s\\S]+?)<[\\s\\S]+?' +
         'Lifetime:<\\/b>([\\s\\S]+?)<'
     ),
     eventMatchDetailExp = new RegExp(
@@ -76,8 +75,7 @@ function parseEvents(callback) {
                         players: arr[3].trim(),
                         format: arr[4].trim(),
                         place: arr[6].trim(),
-                        seasonalPoints: arr[7].trim(),
-                        lifetimePoints: arr[8].trim(),
+                        pwPoints: arr[7].trim(),
                         matches: []
                     };
 
