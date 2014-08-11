@@ -1,4 +1,5 @@
 var async = require('async'),
+    db = require('db'),
     fs = require('fs'),
     nconf = require('nconf'),
     req = require('request').defaults({jar: true}),
@@ -42,6 +43,8 @@ var authEncryptUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/GetE
     );
 
 function parseEvents(callback) {
+    console.log('Parsing WOTC events...');
+
     //Get events
     req.post(eventsUrl + dciNumber, function(error, resp, body) {
         var eventData = JSON.parse(body).Data[1].Value,
@@ -50,7 +53,8 @@ function parseEvents(callback) {
 
         while((arr = eventsExp.exec(eventData)) !== null) {
             events.push({
-                id: arr[1],
+                dciNumber: dciNumber,
+                eventId: arr[1],
                 description: arr[2],
                 location: arr[3]
             });
@@ -58,7 +62,7 @@ function parseEvents(callback) {
 
         //Get event details
         async.map(events, function(evt, mapCb) {
-            req.post(eventDetailUrl + evt.id, function(error, resp, body) {
+            req.post(eventDetailUrl + evt.eventId, function(error, resp, body) {
                 var eventDetailData = JSON.parse(body).Data.Value;
 
                 //Parse event details
@@ -81,7 +85,7 @@ function parseEvents(callback) {
                     while((arr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
                         evt.results.matches.push({
                             result: arr[1].trim(),
-                            points: arr[2].trim(),
+                            points: arr[2].trim().replace(/[\(\)]/g,''),
                             opponent: arr[3].trim(),
                         });
                     }
@@ -97,6 +101,8 @@ function parseEvents(callback) {
 }
 
 function authenticate(callback) {
+    console.log('Authenticating with WOTC...');
+
     //Authenticate and parse events
     req.post(authEncryptUrl, function(error, resp, body) {
         var cryptoData = JSON.parse(body).ModalData.ResponseData;
@@ -153,6 +159,27 @@ module.exports = {
             parseEvents
         ], function(err, results) {
             callback(err, results[1]);
+        });
+    },
+
+    sync: function(callback) {
+        var me = this;
+
+        db.remove({ dciNumber: dciNumber }, function(err, results) {
+            if(err) {
+                console.log('Error removing records for ID:', dciNumber);
+                callback(err, []);
+            } else {
+                me.get(function(err, results) {
+                    db.insert(results, function(err, results) {
+                        if(err) {
+                            callback(err, 'Sync failed!');
+                        } else {
+                            callback(err, 'Sync success!');
+                        }
+                    });
+                });
+            }
         });
     }
 };
