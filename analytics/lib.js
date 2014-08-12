@@ -66,20 +66,3 @@ exports.getMatchRecord = function(matches, callback) {
 
     callback(null, [ wins, losses, draws, byes ]);
 };
-
-/**
- * Calculates winrates for a set of matches
- *
- * Win-only, wins/draws, and wins/draws/byes
- */
-exports.getMatchWinRate = function(matches, callback) {
-    this.getMatchRecord(matches, function(err, stats) {
-        var wins = stats[0], losses = stats[1], draws = stats[2], byes = stats[3],
-            total = wins + losses + draws + byes,
-            winRate = wins / total,
-            winDrawRate = (wins + draws) / total,
-            winDrawByeRate = (wins + draws + byes) / total;
-
-        callback(err, [ winRate, winDrawRate, winDrawByeRate ]);
-    });
-};

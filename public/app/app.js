@@ -14,7 +14,7 @@ require([
 
     //Ram some data in a chart
     Ember.$.get('/analytics/matchstats', function(stats) {
-        var winData = stats.data[0];
+        var winData = stats.data;
 
         var chartTemplate = {
             tooltip: {
@@ -31,10 +31,9 @@ require([
             }
         };
 
-        //All data
-        Ember.$("#overallRecord").highcharts(_.extend(chartTemplate, {
+        Ember.$("#matchStats1").highcharts(_.extend(chartTemplate, {
             title: {
-                text: 'Raw Match Stats'
+                text: 'All'
             },
             series: [{
                 type: 'pie',
@@ -47,28 +46,28 @@ require([
             }]
         }));
 
-        Ember.$("#winsDraws").highcharts(_.extend(chartTemplate, {
+        Ember.$("#matchStats2").highcharts(_.extend(chartTemplate, {
             title: {
-                text: 'Wins (including draws)'
+                text: 'Excluding draws'
             },
             series: [{
                 type: 'pie',
                 data: [
-                    [ 'Wins', winData[0] + winData[2] ],
+                    [ 'Wins', winData[0] ],
                     [ 'Losses', winData[1] ],
                     [ 'Byes', + winData[3] ]
                 ]
             }]
         }));
 
-        Ember.$("#winsDrawsByes").highcharts(_.extend(chartTemplate, {
+        Ember.$("#matchStats3").highcharts(_.extend(chartTemplate, {
             title: {
-                text: 'Record (including draws and byes)'
+                text: 'Excluding draws, counting byes'
             },
             series: [{
                 type: 'pie',
                 data: [
-                    [ 'Wins', winData[0] + winData[2] + winData[3] ],
+                    [ 'Wins', winData[0] + winData[3] ],
                     [ 'Losses', winData[1] ]
                 ]
             }]
