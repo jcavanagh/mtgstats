@@ -1,5 +1,9 @@
 extends layout
 
+block styles
+    link(type='text/css', rel='stylesheet', href='vendor/bootstrap/dist/css/bootstrap.min.css')
+    link(type='text/css', rel='stylesheet', href='vendor/bootstrap/dist/css/bootstrap-theme.min.css')
+
 block scripts
     script(type='text/javascript', src='vendor/requirejs/require.js')
     script(type='text/javascript', src='require-init.js')
