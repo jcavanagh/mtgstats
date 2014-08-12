@@ -1,5 +1,7 @@
 extends layout
 
-block content
-    script(type='text/javascript', src='/chartjs/Chart.min.js')
-    h1 Got there
+block scripts
+    script(type='text/javascript', src='vendor/requirejs/require.js')
+    script(type='text/javascript', src='require-init.js')
+
+    script(type='text/javascript', src='app/app.js')
