@@ -9,18 +9,26 @@ require.config({
         'ehbs': '/vendor/requirejs-ember-handlebars/ehbs',
         'text': '/vendor/requirejs-text/text',
 
-        'highcharts': '/vendor/highcharts/highcharts'
+        'highcharts': '/vendor/highcharts/highcharts',
+
+        'bootstrap': '/vendor/bootstrap/dist/js/bootstrap.min',
+        'underscore': '/vendor/underscore/underscore'
     },
 
     shim: {
+        'bootstrap': {
+            deps: [ 'jquery' ]
+        },
+        'ember': {
+            deps:[ 'jquery', 'handlebars' ],
+            exports: 'Ember'
+        },
         'highcharts': {
             deps: [ 'jquery' ],
             exports: 'Highcharts'
         },
-
-        'ember': {
-            deps:[ 'jquery', 'handlebars' ],
-            exports: 'Ember'
+        'underscore': {
+            exports: '_'
         }
     },
 

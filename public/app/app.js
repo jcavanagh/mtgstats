@@ -1,7 +1,9 @@
 require([
     'ember',
     'highcharts',
-    'ehbs!index',
+    'bootstrap',
+    'underscore',
+    'ehbs!index'
 ], function() {
     //Create app
     window.MTGS = Ember.Application.create({
@@ -14,11 +16,7 @@ require([
     Ember.$.get('/analytics/matchstats', function(stats) {
         var winData = stats.data[0];
 
-        Ember.$("#overallRecord").highcharts({
-            chart: {},
-            title: {
-                text: 'Raw Match Stats'
-            },
+        var chartTemplate = {
             tooltip: {
                 pointFormat: '{point.percentage:.1f}%'
             },
@@ -30,6 +28,13 @@ require([
                         format: '<b>{point.name}:</b> {point.percentage:.1f}%'
                     }
                 }
+            }
+        };
+
+        //All data
+        Ember.$("#overallRecord").highcharts(_.extend(chartTemplate, {
+            title: {
+                text: 'Raw Match Stats'
             },
             series: [{
                 type: 'pie',
@@ -40,6 +45,33 @@ require([
                     [ 'Byes', + winData[3] ]
                 ]
             }]
-        });
+        }));
+
+        Ember.$("#winsDraws").highcharts(_.extend(chartTemplate, {
+            title: {
+                text: 'Wins (including draws)'
+            },
+            series: [{
+                type: 'pie',
+                data: [
+                    [ 'Wins', winData[0] + winData[2] ],
+                    [ 'Losses', winData[1] ],
+                    [ 'Byes', + winData[3] ]
+                ]
+            }]
+        }));
+
+        Ember.$("#winsDrawsByes").highcharts(_.extend(chartTemplate, {
+            title: {
+                text: 'Record (including draws and byes)'
+            },
+            series: [{
+                type: 'pie',
+                data: [
+                    [ 'Wins', winData[0] + winData[2] + winData[3] ],
+                    [ 'Losses', winData[1] ]
+                ]
+            }]
+        }));
     });
 });
