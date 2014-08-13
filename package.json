@@ -8,7 +8,8 @@
     "url": "https://github.com/jcavanagh/mtgstats"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "debug": "node --debug app.js"
   },
   "dependencies": {
     "express": "*",

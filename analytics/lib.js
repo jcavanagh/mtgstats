@@ -1,11 +1,11 @@
-var db = require('db'),
+/* global _, exports */
+var async = require('async'),
+    db = require('db'),
     nconf = require('nconf');
 
 var dciNumber = nconf.get('dciNumber');
 
-/**
- * Gets all played events for a DCI number
- */
+//Generic things
 exports.getEvents = function(query, callback) {
     //Optional query
     if(_.isFunction(query)) {
@@ -18,51 +18,119 @@ exports.getEvents = function(query, callback) {
     db.find(query).toArray(callback);
 };
 
-/**
- * Gets the set of all matches for a DCI number
- */
-exports.getMatches = function(callback) {
-    this.getEvents(function(err, events) {
-        var matches = _.compact(
-            _.map(events, function(evt) {
-                if(!evt.results) {
-                    console.log(evt);
-                    return null;
-                }
+exports.getMatches = function(events, callback) {
+    var matches = _.reduce(events, function(memo, evt) {
+        if(!evt.results) {
+            console.log(evt);
+            return memo;
+        }
 
-                return evt.results.matches;
-            })
-        );
+        return memo.concat(evt.results.matches);
+    }, []);
 
-        callback(err, matches);
-    });
+    callback(null, matches);
 };
 
-/**
- * Computes the win/loss/draw/byes for a set of matches
- */
-exports.getMatchRecord = function(matches, callback) {
+exports.getMatchStats = function(matches, callback) {
     var wins, losses, draws, byes;
     wins = losses = draws = byes = 0;
 
     _.each(matches, function(match) {
-        _.each(match, function(game) {
-            switch(game.result) {
-                case 'Win':
-                    wins++;
-                    break;
-                case 'Loss':
-                    losses++;
-                    break;
-                case 'Draw':
-                    draws++;
-                    break;
-                case 'Bye':
-                    byes++;
-                    break;
-            }
-        });
+        switch(match.result) {
+            case 'Win':
+                wins++;
+                break;
+            case 'Loss':
+                losses++;
+                break;
+            case 'Draw':
+                draws++;
+                break;
+            case 'Bye':
+                byes++;
+                break;
+        }
     });
 
     callback(null, [ wins, losses, draws, byes ]);
+};
+
+//Event helpers
+exports.getEventsByFormat = function(callback) {
+    this.getEvents(function(err, events) {
+        var formatEvents = _.groupBy(events, function(evt) {
+            return evt.results.format;
+        });
+
+        callback(err, formatEvents);
+    });
+};
+
+exports.getEventsByOpponent = function(callback) {
+    this.getEvents(function(err, events) {
+        var formatEvents = _.groupBy(events, function(evt) {
+            return evt.results.format;
+        });
+
+        callback(err, formatEvents);
+    });
+};
+
+//Match helpers
+exports.getAllMatchStats = function(callback) {
+    var me = this;
+    me.getEvents(function(err, events) {
+        me.getMatches(events, function(err, matches) {
+            me.getMatchStats(matches, callback);
+        });
+    });
+};
+
+exports.getMatchesByFormat = function(callback) {
+    var me = this;
+    me.getEventsByFormat(function(err, events) {
+        //Get matches for each event type
+        async.map(_.keys(events), function(evtType, mapCb) {
+            me.getMatches(events[evtType], function(err, matches) {
+                mapCb(err, matches);
+            });
+        }, function(err, mapResult) {
+            //Reassociate matches to event type
+            var formatMatches = _.object(
+                _.keys(events),
+                mapResult
+            );
+
+            callback(err, formatMatches);
+        });
+    });
+};
+
+//Win/loss stats
+exports.getMatchStatsByFormat = function(callback) {
+    var me = this;
+    me.getMatchesByFormat(function(err, matches) {
+        //Get stats for each set of matches
+        async.map(_.keys(matches), function(evtType, mapCb) {
+            me.getMatchStats(matches[evtType], mapCb);
+        }, function(err, mapResult) {
+            //Reassociate match stats with formats
+            var formatMatchStats = _.object(
+                _.keys(matches),
+                mapResult
+            );
+
+            callback(err, formatMatchStats);
+        });
+    });
+};
+
+exports.getMatchStatsByOpponent = function(callback) {
+    this.getEvents(function(err, events) {
+        var formatEvents = _.groupBy(events, function(evt) {
+            return evt.results.format;
+        });
+
+        callback(err, formatEvents);
+    });
 };

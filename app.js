@@ -50,7 +50,16 @@ app.get('/data/wizards/sync', function(req, res, next) {
 
 //Analytics
 app.get('/analytics/matchstats', function(req, res, next) {
-    analytics.getAllMatchStats(function(err, stats) {
+    analytics.getMatchStats(function(err, stats) {
+        res.send({
+            error: err,
+            data: stats
+        });
+    });
+});
+
+app.get('/analytics/matchstats/format', function(req, res, next) {
+    analytics.getMatchStatsByFormat(function(err, stats) {
         res.send({
             error: err,
             data: stats

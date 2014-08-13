@@ -80,11 +80,13 @@ function parseEvents(callback) {
                     };
 
                     //Parse matches
-                    while((arr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
+                    var matchArr;
+                    while((matchArr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
                         evt.results.matches.push({
-                            result: arr[1].trim(),
-                            points: arr[2].trim().replace(/[\(\)]/g,''),
-                            opponent: arr[3].trim(),
+                            result: matchArr[1].trim(),
+                            points: matchArr[2].trim().replace(/[\(\)]/g,''),
+                            opponent: matchArr[3].trim(),
+                            format: evt.results.format
                         });
                     }
                 }

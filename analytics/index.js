@@ -1,8 +1,15 @@
+/* global exports */
 var async = require('async'),
     lib = require('./lib');
 
-exports.getAllMatchStats = function(callback) {
-    lib.getMatches(function(err, matches) {
-        lib.getMatchRecord(matches, callback);
-    });
+exports.getMatchStats = function(callback) {
+    lib.getAllMatchStats(callback);
+};
+
+exports.getMatchStatsByFormat = function(callback) {
+    lib.getMatchStatsByFormat(callback);
+};
+
+exports.getMatchStatsByOpponent = function(callback) {
+    lib.getMatchStatsByOpponent(callback);
 };
