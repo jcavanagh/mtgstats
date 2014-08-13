@@ -12,26 +12,27 @@ require([
         LOG_TRANSITIONS: true
     });
 
-    //Ram some data in a chart
+    var chartTemplate = {
+        tooltip: {
+            pointFormat: '{point.percentage:.1f}%'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}:</b> {point.percentage:.1f}%'
+                }
+            }
+        }
+    };
+
+    //General match stats
     Ember.$.get('/analytics/matchstats', function(stats) {
         var winData = stats.data;
 
-        var chartTemplate = {
-            tooltip: {
-                pointFormat: '{point.percentage:.1f}%'
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}:</b> {point.percentage:.1f}%'
-                    }
-                }
-            }
-        };
-
-        Ember.$("#matchStats1").highcharts(_.extend(chartTemplate, {
+        Ember.$('#matchStatsContainer').append('<div class="col-md-4"></div>');
+        Ember.$('#matchStatsContainer > div:nth-of-type(1)').highcharts(_.extend(chartTemplate, {
             title: {
                 text: 'All'
             },
@@ -46,7 +47,8 @@ require([
             }]
         }));
 
-        Ember.$("#matchStats2").highcharts(_.extend(chartTemplate, {
+        Ember.$('#matchStatsContainer').append('<div class="col-md-4"></div>');
+        Ember.$('#matchStatsContainer > div:nth-of-type(2)').highcharts(_.extend(chartTemplate, {
             title: {
                 text: 'Excluding draws'
             },
@@ -60,7 +62,8 @@ require([
             }]
         }));
 
-        Ember.$("#matchStats3").highcharts(_.extend(chartTemplate, {
+        Ember.$('#matchStatsContainer').append('<div class="col-md-4"></div>');
+        Ember.$('#matchStatsContainer > div:nth-of-type(3)').highcharts(_.extend(chartTemplate, {
             title: {
                 text: 'Excluding draws, counting byes'
             },
@@ -72,5 +75,36 @@ require([
                 ]
             }]
         }));
+    });
+
+    //Format match stats
+    Ember.$.get('/analytics/matchstats/format', function(stats) {
+        var formatData = stats.data;
+
+        //Sort by most-played formats
+        formatData = _.pairs(formatData).sort(function(a, b) {
+            return b[1].count - a[1].count;
+        });
+
+        _.each(formatData, function(item, index) {
+            var formatName = item[0],
+                formatStats = item[1];
+
+            Ember.$('#formatStatsContainer').append('<div class="col-md-4"></div>');
+            Ember.$('#formatStatsContainer > div:nth-of-type(' + (index + 1) + ')').highcharts(_.extend(chartTemplate, {
+                title: {
+                    text: formatName
+                },
+                series: [{
+                    type: 'pie',
+                    data: [
+                        [ 'Wins', formatStats[0] ],
+                        [ 'Losses', formatStats[1] ],
+                        [ 'Draws', formatStats[2] ],
+                        [ 'Byes', + formatStats[3] ]
+                    ]
+                }]
+            }));
+        });
     });
 });
