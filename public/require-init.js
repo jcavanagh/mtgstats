@@ -12,7 +12,7 @@ require.config({
         'highcharts': '/vendor/highcharts/highcharts',
 
         'bootstrap': '/vendor/bootstrap/dist/js/bootstrap.min',
-        'underscore': '/vendor/underscore/underscore'
+        'lodash': '/vendor/lodash/dist/lodash'
     },
 
     shim: {
@@ -27,7 +27,7 @@ require.config({
             deps: [ 'jquery' ],
             exports: 'Highcharts'
         },
-        'underscore': {
+        'lodash': {
             exports: '_'
         }
     },
