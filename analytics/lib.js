@@ -1,6 +1,5 @@
 /* global _, exports */
-var async = require('async'),
-    db = require('db'),
+var db = require('db'),
     nconf = require('nconf');
 
 var dciNumber = nconf.get('dciNumber');
@@ -18,7 +17,7 @@ exports.getEvents = function(query, callback) {
     db.find(query).toArray(callback);
 };
 
-exports.getMatches = function(events, callback) {
+exports.extractMatches = function(events) {
     var matches = _.reduce(events, function(memo, evt) {
         if(!evt.results) {
             console.log(evt);
@@ -28,10 +27,10 @@ exports.getMatches = function(events, callback) {
         return memo.concat(evt.results.matches);
     }, []);
 
-    callback(null, matches);
+    return matches;
 };
 
-exports.getMatchStats = function(matches, callback) {
+exports.extractMatchStats = function(matches) {
     var wins, losses, draws, byes;
     wins = losses = draws = byes = 0;
 
@@ -52,7 +51,7 @@ exports.getMatchStats = function(matches, callback) {
         }
     });
 
-    callback(null, [ wins, losses, draws, byes ]);
+    return [ wins, losses, draws, byes ];
 };
 
 //Event helpers
@@ -68,11 +67,26 @@ exports.getEventsByFormat = function(callback) {
 
 exports.getEventsByOpponent = function(callback) {
     this.getEvents(function(err, events) {
-        var formatEvents = _.groupBy(events, function(evt) {
-            return evt.results.format;
+        var oppEvents = {};
+        _.each(events, function(evt) {
+            if(evt.results) {
+                _.each(evt.results.matches, function(match) {
+                    var opp = match.opponent;
+                    oppEvents[opp] = oppEvents[opp] || [];
+                    oppEvents[opp].push(evt);
+                });
+            }
         });
 
-        callback(err, formatEvents);
+        //Strip duplicates
+        var uniqEvents = _.object(
+            _.keys(oppEvents),
+            _.map(_.values(oppEvents), function(matches) {
+                return _.uniq(matches);
+            })
+        );
+
+        callback(err, uniqEvents);
     });
 };
 
@@ -80,9 +94,9 @@ exports.getEventsByOpponent = function(callback) {
 exports.getAllMatchStats = function(callback) {
     var me = this;
     me.getEvents(function(err, events) {
-        me.getMatches(events, function(err, matches) {
-            me.getMatchStats(matches, callback);
-        });
+        var stats = me.extractMatchStats(me.extractMatches(events));
+
+        callback(err, stats);
     });
 };
 
@@ -90,19 +104,14 @@ exports.getMatchesByFormat = function(callback) {
     var me = this;
     me.getEventsByFormat(function(err, events) {
         //Get matches for each event type
-        async.map(_.keys(events), function(evtType, mapCb) {
-            me.getMatches(events[evtType], function(err, matches) {
-                mapCb(err, matches);
-            });
-        }, function(err, mapResult) {
-            //Reassociate matches to event type
-            var formatMatches = _.object(
-                _.keys(events),
-                mapResult
-            );
+        var formatMatches = _.object(
+            _.keys(events),
+            _.map(_.keys(events), function(evtType) {
+                return me.extractMatches(events[evtType]);
+            })
+        );
 
-            callback(err, formatMatches);
-        });
+        callback(err, formatMatches);
     });
 };
 
@@ -111,26 +120,39 @@ exports.getMatchStatsByFormat = function(callback) {
     var me = this;
     me.getMatchesByFormat(function(err, matches) {
         //Get stats for each set of matches
-        async.map(_.keys(matches), function(evtType, mapCb) {
-            me.getMatchStats(matches[evtType], mapCb);
-        }, function(err, mapResult) {
-            //Reassociate match stats with formats
-            var formatMatchStats = _.object(
-                _.keys(matches),
-                mapResult
-            );
+        var formatMatchStats = _.object(
+            _.keys(matches),
+            _.map(_.keys(matches), function(evtType) {
+                return me.extractMatchStats(matches[evtType]);
+            })
+        );
 
-            callback(err, formatMatchStats);
-        });
+        callback(err, formatMatchStats);
     });
 };
 
 exports.getMatchStatsByOpponent = function(callback) {
-    this.getEvents(function(err, events) {
-        var formatEvents = _.groupBy(events, function(evt) {
-            return evt.results.format;
-        });
+    var me = this;
+    me.getEventsByOpponent(function(err, events) {
+        var oppMatchStats = _.object(
+            _.keys(events),
+            _.map(_.keys(events), function(opp) {
+                //For all events, extract the matches played vs this person
+                var matches = [];
+                _.each(events[opp], function(evt) {
+                    if(evt.results) {
+                        matches = matches.concat(
+                            _.filter(evt.results.matches, function(match) {
+                                return match.opponent == opp;
+                            })
+                        );
+                    }
+                });
 
-        callback(err, formatEvents);
+                return me.extractMatchStats(matches);
+            })
+        );
+
+        callback(err, oppMatchStats);
     });
 };

@@ -85,7 +85,7 @@ function parseEvents(callback) {
                         evt.results.matches.push({
                             result: matchArr[1].trim(),
                             points: matchArr[2].trim().replace(/[\(\)]/g,''),
-                            opponent: matchArr[3].trim(),
+                            opponent: matchArr[3].trim() || 'BYE',
                             format: evt.results.format
                         });
                     }

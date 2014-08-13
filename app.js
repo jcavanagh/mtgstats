@@ -67,4 +67,13 @@ app.get('/analytics/matchstats/format', function(req, res, next) {
     });
 });
 
+app.get('/analytics/matchstats/opponent', function(req, res, next) {
+    analytics.getMatchStatsByOpponent(function(err, stats) {
+        res.send({
+            error: err,
+            data: stats
+        });
+    });
+});
+
 app.listen(process.env.PORT || 8080);
