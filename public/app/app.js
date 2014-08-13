@@ -1,8 +1,9 @@
+/* global _, Ember*/
 require([
     'ember',
     'highcharts',
     'bootstrap',
-    'underscore',
+    'lodash',
     'ehbs!index'
 ], function() {
     //Create app
@@ -83,7 +84,14 @@ require([
 
         //Sort by most-played formats
         formatData = _.pairs(formatData).sort(function(a, b) {
-            return b[1].count - a[1].count;
+            var aSum = _.reduce(a[1], function(sum, item) {
+                    return sum + item;
+                })
+                ,bSum = _.reduce(b[1], function(sum, item) {
+                    return sum + item;
+                });
+
+            return bSum - aSum;
         });
 
         _.each(formatData, function(item, index) {
@@ -102,6 +110,52 @@ require([
                         [ 'Losses', formatStats[1] ],
                         [ 'Draws', formatStats[2] ],
                         [ 'Byes', + formatStats[3] ]
+                    ]
+                }]
+            }));
+        });
+    });
+
+    //Opponent match stats
+    Ember.$.get('/analytics/matchstats/opponent', function(stats) {
+        var opponentData = stats.data;
+
+        //Sort by top X most-played opponents, filter single-match opponents
+        opponentData = _.chain(opponentData)
+            .omit(function(val) {
+                return val.length <= 1;
+            })
+            .omit('BYE')
+            .pairs()
+            .sort(function(a, b) {
+                var aSum = _.reduce(a[1], function(sum, item) {
+                        return sum + item;
+                    })
+                    ,bSum = _.reduce(b[1], function(sum, item) {
+                        return sum + item;
+                    });
+
+                return bSum - aSum;
+            })
+            .first(10)
+            .value();
+
+        _.each(opponentData, function(item, index) {
+            var oppName = item[0],
+                opponentStats = item[1];
+
+            Ember.$('#opponentStatsContainer').append('<div class="col-md-4"></div>');
+            Ember.$('#opponentStatsContainer > div:nth-of-type(' + (index + 1) + ')').highcharts(_.extend(chartTemplate, {
+                title: {
+                    text: oppName
+                },
+                series: [{
+                    type: 'pie',
+                    data: [
+                        [ 'Wins', opponentStats[0] ],
+                        [ 'Losses', opponentStats[1] ],
+                        [ 'Draws', opponentStats[2] ],
+                        [ 'Byes', + opponentStats[3] ]
                     ]
                 }]
             }));

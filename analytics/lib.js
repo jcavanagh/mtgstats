@@ -79,6 +79,7 @@ exports.getEventsByOpponent = function(callback) {
         });
 
         //Strip duplicates
+        //FIXME: lodash transform
         var uniqEvents = _.object(
             _.keys(oppEvents),
             _.map(_.values(oppEvents), function(matches) {
@@ -104,6 +105,7 @@ exports.getMatchesByFormat = function(callback) {
     var me = this;
     me.getEventsByFormat(function(err, events) {
         //Get matches for each event type
+        //FIXME: lodash transform
         var formatMatches = _.object(
             _.keys(events),
             _.map(_.keys(events), function(evtType) {
@@ -120,6 +122,7 @@ exports.getMatchStatsByFormat = function(callback) {
     var me = this;
     me.getMatchesByFormat(function(err, matches) {
         //Get stats for each set of matches
+        //FIXME: lodash transform
         var formatMatchStats = _.object(
             _.keys(matches),
             _.map(_.keys(matches), function(evtType) {
