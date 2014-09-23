@@ -9,6 +9,11 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
  */
 define([], function() {
     return Ember.Controller.extend({
-        //Nothing to do
+        lands: function() {
+            var me = this;
+            Ember.$.get('/data/mana/lands', function(lands) {
+                me.set('lands', lands.data);
+            });
+        }.property('lands.@each')
     });
 });

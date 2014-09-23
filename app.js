@@ -29,7 +29,6 @@ app.get('/', function(req, res, next) {
 //Routes
 var loadRoutes = function(routes) {
     _.each(routes, function(rte) {
-        console.log(rte);
         app[rte.method](rte.route, rte.fn);
     });
 }
