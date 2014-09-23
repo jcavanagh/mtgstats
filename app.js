@@ -26,54 +26,18 @@ app.get('/', function(req, res, next) {
     res.render('index');
 });
 
-//Data
-var wiz = require('data/wizards/index.js'),
-    analytics = require('analytics/index.js');
-
-app.get('/data/wizards', function(req, res, next) {
-    wiz.get(function(err, results) {
-        res.send({
-            error: err,
-            data: results
-        });
+//Routes
+var loadRoutes = function(routes) {
+    _.each(routes, function(rte) {
+        app[rte.method](rte.route, rte.fn);
     });
-});
+}
 
-app.get('/data/wizards/sync', function(req, res, next) {
-    wiz.sync(function(err, results) {
-        res.send({
-            error: err,
-            data: results
-        });
-    });
-});
+var matchRoutes = require('routes/match'),  
+    manaRoutes = require('routes/mana');
 
-//Analytics
-app.get('/analytics/matchstats', function(req, res, next) {
-    analytics.getMatchStats(function(err, stats) {
-        res.send({
-            error: err,
-            data: stats
-        });
-    });
-});
+loadRoutes(matchRoutes);
+loadRoutes(manaRoutes);
 
-app.get('/analytics/matchstats/format', function(req, res, next) {
-    analytics.getMatchStatsByFormat(function(err, stats) {
-        res.send({
-            error: err,
-            data: stats
-        });
-    });
-});
-
-app.get('/analytics/matchstats/opponent', function(req, res, next) {
-    analytics.getMatchStatsByOpponent(function(err, stats) {
-        res.send({
-            error: err,
-            data: stats
-        });
-    });
-});
-
+//Fire it up
 app.listen(process.env.PORT || 8080);

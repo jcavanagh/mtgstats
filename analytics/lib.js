@@ -1,161 +1,64 @@
-/* global _, exports */
-var db = require('db'),
-    nconf = require('nconf');
+/* global _ */
+//Stats are fun!
 
-var dciNumber = nconf.get('dciNumber');
-
-//Generic things
-exports.getEvents = function(query, callback) {
-    //Optional query
-    if(_.isFunction(query)) {
-        callback = query;
-        query = {};
+//Factorial
+//TODO: Memoize
+this.factorial = function(n) {
+    var result = 1;
+    for (var i = 2; i <= n; i++) {
+        result *= i;
     }
 
-    query.dciNumber = dciNumber;
-
-    db.find(query).toArray(callback);
+    return result;
 };
 
-exports.extractMatches = function(events) {
-    var matches = _.reduce(events, function(memo, evt) {
-        if(!evt.results) {
-            console.log(evt);
-            return memo;
-        }
+//Binomial coefficient
+//From a set of size n, return number of distinct subsets of size k
+//Positive integers only
+this.binomialCoeff = function(n, k) {
+    if(k === 0 || n === k) {
+        return 1;
+    }
 
-        return memo.concat(evt.results.matches);
-    }, []);
+    if(k > n) {
+        return 0;
+    }
 
-    return matches;
+    return this.factorial(n) / (this.factorial(k) * this.factorial(n - k));
 };
 
-exports.extractMatchStats = function(matches) {
-    var wins, losses, draws, byes;
-    wins = losses = draws = byes = 0;
-
-    _.each(matches, function(match) {
-        switch(match.result) {
-            case 'Win':
-                wins++;
-                break;
-            case 'Loss':
-                losses++;
-                break;
-            case 'Draw':
-                draws++;
-                break;
-            case 'Bye':
-                byes++;
-                break;
-        }
-    });
-
-    return [ wins, losses, draws, byes ];
+//Hypergeometric, equal to target successes
+this.hyp = function(pop, pSuc, sample, tSuc) {
+    return ( this.binomialCoeff(pSuc, tSuc) * this.binomialCoeff(pop - pSuc, sample - tSuc) ) / this.binomialCoeff(pop, sample);
 };
 
-//Event helpers
-exports.getEventsByFormat = function(callback) {
-    this.getEvents(function(err, events) {
-        var formatEvents = _.groupBy(events, function(evt) {
-            return evt.results.format;
-        });
-
-        callback(err, formatEvents);
-    });
+//Hypergeometric, less than target successes
+this.hyplt = function(pop, pSuc, sample, tSuc) {
+    return _.reduce(_.range(tSuc), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
-exports.getEventsByOpponent = function(callback) {
-    this.getEvents(function(err, events) {
-        var oppEvents = {};
-        _.each(events, function(evt) {
-            if(evt.results) {
-                _.each(evt.results.matches, function(match) {
-                    var opp = match.opponent;
-                    oppEvents[opp] = oppEvents[opp] || [];
-                    oppEvents[opp].push(evt);
-                });
-            }
-        });
-
-        //Strip duplicates
-        //FIXME: lodash transform
-        var uniqEvents = _.object(
-            _.keys(oppEvents),
-            _.map(_.values(oppEvents), function(matches) {
-                return _.uniq(matches);
-            })
-        );
-
-        callback(err, uniqEvents);
-    });
+//Hypergeometric, less than or equal to target successes
+this.hyplte = function(pop, pSuc, sample, tSuc) {
+    return _.reduce(_.range(tSuc + 1), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
-//Match helpers
-exports.getAllMatchStats = function(callback) {
-    var me = this;
-    me.getEvents(function(err, events) {
-        var stats = me.extractMatchStats(me.extractMatches(events));
-
-        callback(err, stats);
-    });
+//Hypergeometric, greater than target successes
+this.hypgt = function(pop, pSuc, sample, tSuc) {
+    return _.reduce(_.range(tSuc + 1, sample + 1), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
-exports.getMatchesByFormat = function(callback) {
-    var me = this;
-    me.getEventsByFormat(function(err, events) {
-        //Get matches for each event type
-        //FIXME: lodash transform
-        var formatMatches = _.object(
-            _.keys(events),
-            _.map(_.keys(events), function(evtType) {
-                return me.extractMatches(events[evtType]);
-            })
-        );
-
-        callback(err, formatMatches);
-    });
+//Hypergeometric, greater than or equal to target successes
+this.hypgte = function(pop, pSuc, sample, tSuc) {
+    return _.reduce(_.range(tSuc, sample + 1), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
-//Win/loss stats
-exports.getMatchStatsByFormat = function(callback) {
-    var me = this;
-    me.getMatchesByFormat(function(err, matches) {
-        //Get stats for each set of matches
-        //FIXME: lodash transform
-        var formatMatchStats = _.object(
-            _.keys(matches),
-            _.map(_.keys(matches), function(evtType) {
-                return me.extractMatchStats(matches[evtType]);
-            })
-        );
-
-        callback(err, formatMatchStats);
-    });
-};
-
-exports.getMatchStatsByOpponent = function(callback) {
-    var me = this;
-    me.getEventsByOpponent(function(err, events) {
-        var oppMatchStats = _.object(
-            _.keys(events),
-            _.map(_.keys(events), function(opp) {
-                //For all events, extract the matches played vs this person
-                var matches = [];
-                _.each(events[opp], function(evt) {
-                    if(evt.results) {
-                        matches = matches.concat(
-                            _.filter(evt.results.matches, function(match) {
-                                return match.opponent == opp;
-                            })
-                        );
-                    }
-                });
-
-                return me.extractMatchStats(matches);
-            })
-        );
-
-        callback(err, oppMatchStats);
-    });
-};
+//Exports
+module.exports = this;
