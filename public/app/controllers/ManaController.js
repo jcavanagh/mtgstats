@@ -38,7 +38,7 @@ define([], function() {
         }),
 
         emptyView: Ember.View.extend({
-            template: Ember.Handlebars.compile("The collection is empty")
+            template: Ember.Handlebars.compile("No rules defined")
         })
     });
 
@@ -63,11 +63,13 @@ define([], function() {
         selectedLands: [],
         model: {
             rules: [],
-            white: null,
-            blue: null,
-            black: null,
-            red: null,
-            green: null,
+            colors: {
+                white: null,
+                blue: null,
+                black: null,
+                red: null,
+                green: null,
+            },
             landCount: 24
         },
 
@@ -89,8 +91,8 @@ define([], function() {
                 });
             },
 
-            deleteRule: function() {
-                debugger;
+            deleteRule: function(rule) {
+                this.get('model.rules').removeObject(rule);
             }
         }
     });

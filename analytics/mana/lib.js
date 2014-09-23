@@ -20,20 +20,23 @@ function getCombos(items) {
     return combos;
 }
 
+function getLandDists(lands, landCount) {
+    
+}
+
 exports.optimize = function(dataz) {
     var lands = dataz.lands || [],
         landCount = dataz.landCount || 0,
         rules = dataz.rules || [],
-        w = dataz.white || 0,
-        u = dataz.blue || 0,
-        b = dataz.black || 0,
-        r = dataz.red || 0,
-        g = dataz.green || 0;
+        colors = dataz.colors;
 
     //Generate all combinations of selected lands
     var landCombos = getCombos(lands);
 
     _.each(landCombos, function(combo) {
         //Generate distributions of selected lands
+        var landDists = getLandDists(combo, landCount);
+
+        //Generate probabilities from rules for this land combo
     });
 };
