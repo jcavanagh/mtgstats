@@ -3,41 +3,71 @@
 <div class="container-fluid">
 <div class="row">
     <form class="form-horizontal" role="form">
-        <div class="col-sm-2">
-            <div class="form-group">
-                <label class="col-sm-4 control-label">White</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="white">
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Total Mana Symbols</div>
+                <div class="panel-body">
+                    <div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">White</label>
+                            <div class="col-sm-8">
+                                {{view Ember.TextField valueBinding="model.white" class="form-control"}}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Blue</label>
+                            <div class="col-sm-8">
+                                {{view Ember.TextField valueBinding="model.blue" class="form-control"}}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Black</label>
+                            <div class="col-sm-8">
+                                {{view Ember.TextField valueBinding="model.black" class="form-control"}}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Red</label>
+                            <div class="col-sm-8">
+                                {{view Ember.TextField valueBinding="model.red" class="form-control"}}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Green</label>
+                            <div class="col-sm-8">
+                                {{view Ember.TextField valueBinding="model.green" class="form-control"}}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Land Count</label>
+                            <div class="col-sm-8">
+                                {{view Ember.TextField valueBinding="model.landCount" class="form-control"}}
+                            </div>
+                        </div>
+                        <button {{action submit}} class="btn btn-primary">Optimize</button>
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-sm-4 control-label">Blue</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="blue">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-4 control-label">Black</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="black">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-4 control-label">Red</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="red">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-4 control-label">Green</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="green">
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Optimize</button>
         </div>
-        <div class="col-sm-8">
-                {{view MTGS.ManaCheckboxView contentBinding="lands" selectedLandsBinding="selectedLands"}} 
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading clearfix">
+                    Rules
+                    <div class="pull-right">
+                        <button {{action addRule}} class="btn btn-xs btn-primary">Add Rule</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {{view MTGS.RulesView contentBinding="model.rules"}}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Lands To Use</div>
+                <div class="panel-body">
+                    {{view MTGS.ManaCheckboxView contentBinding="lands" selectedLandsBinding="selectedLands"}}
+                </div>
             </div>
         </div>
     </form>

@@ -8,6 +8,9 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
  * @author Joe Cavanagh
  */
 define([], function() {
+    MTGS.LandColors = ['W', 'U', 'B', 'R', 'G'];
+    MTGS.Turns = _.range(1, 10);
+
     MTGS.LandCheckbox = Ember.Checkbox.extend({
         selectedLandsBinding: 'parentView.selectedLands',
 
@@ -21,10 +24,7 @@ define([], function() {
                 selectedLands = this.get('selectedLands'),
                 land = this.get('content');
 
-            console.log("land = ", land);
-            console.log("will be: ", isPresent ? "removed" : "added");
-
-            if (!isPresent) {
+            if (isPresent) {
                 selectedLands.pushObject(land);
             } else {
                 selectedLands.removeObject(land);
@@ -32,13 +32,23 @@ define([], function() {
         }
     });
 
+    MTGS.RulesView = Ember.CollectionView.extend({
+        itemViewClass: Ember.View.extend({
+            templateName: '_rules'
+        }),
+
+        emptyView: Ember.View.extend({
+            template: Ember.Handlebars.compile("The collection is empty")
+        })
+    });
+
     MTGS.ManaCheckboxView = Ember.CollectionView.extend({
         contentBinding: 'MTGS.ManaController.lands',
         selectedLandsBinding: 'MTGS.ManaController.selectedLands',
-        tagName: 'ul',
+        tagName: 'div',
         itemViewClass: Ember.View.extend({
             selectedLandsBinding: 'parentView.selectedLands',
-            templateName: 'lands'
+            templateName: '_lands'
         })
     });
 
@@ -51,9 +61,37 @@ define([], function() {
         }.property('lands.@each'),
 
         selectedLands: [],
+        model: {
+            rules: [],
+            white: null,
+            blue: null,
+            black: null,
+            red: null,
+            green: null,
+            landCount: 24
+        },
 
-        submitAction: function() {
-            console.log('Submit!');
+        actions: {
+            submit: function() {
+                //Assemble model
+                var model = this.get('model');
+                model.lands = this.selectedLands;
+
+                //Post!
+                Ember.$.post('/analytics/mana/stats', model);
+            },
+
+            addRule: function() {
+                this.get('model.rules').pushObject({
+                    count: 0,
+                    color: null,
+                    turn: null
+                });
+            },
+
+            deleteRule: function() {
+                debugger;
+            }
         }
     });
 });

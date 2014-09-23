@@ -1,5 +1,5 @@
 var lands = require('data/mana/lands'),
-    landMath = require('analytics/mana/');
+    landMath = require('analytics/mana/lib');
 
 module.exports = [{
     route: '/data/mana/lands',
@@ -11,13 +11,12 @@ module.exports = [{
         });
     }
 },{
-    route: '/data/mana/stats',
+    route: '/analytics/mana/stats',
     method: 'post',
     fn: function(req, res, next) {
-        console.log(req);
         res.send({
             error: null,
-            data: {}
+            data: landMath.optimize(req.body)
         });
     }
 }];

@@ -10,7 +10,8 @@ define([
     'ehbs!_footer',
     'ehbs!index',
     'ehbs!charts',
-    'ehbs!lands',
+    'ehbs!_lands',
+    'ehbs!_rules',
     'ehbs!mana'
 ], function() {
     //Auto-installed as Ember templates by the require helper
