@@ -25,7 +25,7 @@ define([], function() {
             };
 
             //General match stats
-            Ember.$.get('/analytics/matchstats', function(stats) {
+            Ember.$.get('/analytics/match/all', function(stats) {
                 var winData = stats.data;
 
                 Ember.$('#matchStatsContainer').append('<div class="col-md-4"></div>');
@@ -75,7 +75,7 @@ define([], function() {
             });
 
             //Format match stats
-            Ember.$.get('/analytics/matchstats/format', function(stats) {
+            Ember.$.get('/analytics/match/format', function(stats) {
                 var formatData = stats.data;
 
                 //Sort by most-played formats
@@ -113,7 +113,7 @@ define([], function() {
             });
 
             //Opponent match stats
-            Ember.$.get('/analytics/matchstats/opponent', function(stats) {
+            Ember.$.get('/analytics/match/opponent', function(stats) {
                 var opponentData = stats.data;
 
                 //Sort by top X most-played opponents, filter single-match opponents

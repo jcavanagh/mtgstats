@@ -27,10 +27,10 @@ app.get('/', function(req, res, next) {
 });
 
 //Data
-var wiz = require('data/wizards/index.js'),
-    analytics = require('analytics/index.js');
+var wiz = require('data/match/wizards.js'),
+    analytics = require('analytics/match/lib.js');
 
-app.get('/data/wizards', function(req, res, next) {
+app.get('/data/match/wizards', function(req, res, next) {
     wiz.get(function(err, results) {
         res.send({
             error: err,
@@ -39,7 +39,7 @@ app.get('/data/wizards', function(req, res, next) {
     });
 });
 
-app.get('/data/wizards/sync', function(req, res, next) {
+app.get('/data/match/wizards/sync', function(req, res, next) {
     wiz.sync(function(err, results) {
         res.send({
             error: err,
@@ -49,8 +49,8 @@ app.get('/data/wizards/sync', function(req, res, next) {
 });
 
 //Analytics
-app.get('/analytics/matchstats', function(req, res, next) {
-    analytics.getMatchStats(function(err, stats) {
+app.get('/analytics/match/all', function(req, res, next) {
+    analytics.getAllMatchStats(function(err, stats) {
         res.send({
             error: err,
             data: stats
@@ -58,7 +58,7 @@ app.get('/analytics/matchstats', function(req, res, next) {
     });
 });
 
-app.get('/analytics/matchstats/format', function(req, res, next) {
+app.get('/analytics/match/format', function(req, res, next) {
     analytics.getMatchStatsByFormat(function(err, stats) {
         res.send({
             error: err,
@@ -67,7 +67,7 @@ app.get('/analytics/matchstats/format', function(req, res, next) {
     });
 });
 
-app.get('/analytics/matchstats/opponent', function(req, res, next) {
+app.get('/analytics/match/opponent', function(req, res, next) {
     analytics.getMatchStatsByOpponent(function(err, stats) {
         res.send({
             error: err,

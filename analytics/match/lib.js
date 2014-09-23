@@ -58,7 +58,7 @@ exports.extractMatchStats = function(matches) {
 exports.getEventsByFormat = function(callback) {
     this.getEvents(function(err, events) {
         var formatEvents = _.groupBy(events, function(evt) {
-            return evt.results.format;
+            return evt.results ? evt.results.format : 'Unknown';
         });
 
         callback(err, formatEvents);
