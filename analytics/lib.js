@@ -41,17 +41,23 @@ this.hyplt = function(pop, pSuc, sample, tSuc) {
 
 //Hypergeometric, less than or equal to target successes
 this.hyplte = function(pop, pSuc, sample, tSuc) {
-
+    return _.reduce(_.range(tSuc + 1), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
 //Hypergeometric, greater than target successes
 this.hypgt = function(pop, pSuc, sample, tSuc) {
-
+    return _.reduce(_.range(tSuc + 1, sample + 1), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
 //Hypergeometric, greater than or equal to target successes
 this.hypgte = function(pop, pSuc, sample, tSuc) {
-
+    return _.reduce(_.range(tSuc, sample + 1), function(sum, i) {
+        return sum + this.hyp(pop, pSuc, sample, i);
+    }, 0);
 };
 
 //Exports
