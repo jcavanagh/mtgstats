@@ -36,12 +36,9 @@
             </div>
             <button type="submit" class="btn btn-primary">Optimize</button>
         </div>
-        <div id="lands" class="col-sm-8">
-            {{#each land in lands}}
-                <div class="checkbox">
-                    <label><input type="checkbox">{{land.name}}</label>
-                </div>
-            {{/each}}
+        <div class="col-sm-8">
+                {{view MTGS.ManaCheckboxView contentBinding="lands" selectedLandsBinding="selectedLands"}} 
+            </div>
         </div>
     </form>
 </div>
