@@ -11,6 +11,7 @@ define([], function() {
     MTGS.LandColors = ['W', 'U', 'B', 'R', 'G'];
     MTGS.Turns = _.range(1, 10);
 
+    //http://stackoverflow.com/questions/14665026/two-way-binding-between-object-attribute-array-enum-on-server-and-ember-checkb
     MTGS.LandCheckbox = Ember.Checkbox.extend({
         selectedLandsBinding: 'parentView.selectedLands',
 

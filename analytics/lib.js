@@ -27,6 +27,11 @@ this.binomialCoeff = function(n, k) {
     return this.factorial(n) / (this.factorial(k) * this.factorial(n - k));
 };
 
+//Multiset coefficient
+this.multisetCoeff = function(n, k) {
+    return this.binomialCoeff(n + k - 1, k);
+}
+
 //Hypergeometric, equal to target successes
 this.hyp = function(pop, pSuc, sample, tSuc) {
     return ( this.binomialCoeff(pSuc, tSuc) * this.binomialCoeff(pop - pSuc, sample - tSuc) ) / this.binomialCoeff(pop, sample);

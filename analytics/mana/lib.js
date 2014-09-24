@@ -38,5 +38,6 @@ exports.optimize = function(dataz) {
         var landDists = getLandDists(combo, landCount);
 
         //Generate probabilities from rules for this land combo
+        stats = stats;
     });
 };
