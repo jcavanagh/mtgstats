@@ -2,19 +2,29 @@ var async = require('async'),
     db = require('db'),
     fs = require('fs'),
     nconf = require('nconf'),
-    req = require('request').defaults({jar: true}),
-    vm = require('vm');
+    req = require('request').defaults({ jar: true }),
+    qs = require('qs'),
+    vm = require('vm'),
+    libxml = require('libxmljs');
 
-//Wizards "security" garbage
-var WizSec = {};
+//FIXME: Node rejects WotC's certificate for some reason, overriding the check
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
+//Wizards SAML garbage
+var WizSec = {
+    jQuery: req,
+    qs: qs,
+    libxml: libxml
+};
+
 vm.runInNewContext(fs.readFileSync('lib/wizards-security.js'), WizSec);
 
 //Wizards requests
-var authEncryptUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/GetEncryptValues',
-    authUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/Login',
+var authUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/Login',
     eventsUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetPointsHistory/',
     eventDetailUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/JavaScript/GetEventSummary/',
     dciNumber = nconf.get('dciNumber'),
+    dciUsername = nconf.get('dciUsername'),
     dciPassword = nconf.get('dciPassword'),
     eventsExp = new RegExp(
         //Event ID
@@ -103,50 +113,23 @@ function parseEvents(callback) {
 function authenticate(callback) {
     console.log('Authenticating with WOTC...');
 
-    //Authenticate and parse events
-    req.post(authEncryptUrl, function(error, resp, body) {
-        var cryptoData = JSON.parse(body).ModalData.ResponseData;
+    var username = dciUsername;
+    var password = dciPassword;
+    
+    //FIXME: Do I want this?
+    //WizSec.dropSession();
 
-        //Encrypt auth like their servers want it
-        WizSec.setMaxDigits(131);
-
-        var keyPair = new WizSec.RSAKeyPair(cryptoData[0], '', cryptoData[1]),
-            username = new Buffer(dciNumber).toString('base64'),
-            password = new Buffer(dciPassword).toString('base64'),
-            encStr = WizSec.encryptedString(keyPair, cryptoData[2] + '\\' + username + '\\' + password),
-            authForm = {
-                IsModalResult: true,
-                Result: 'custom',
-                ModalContent: null,
-                RedirectUrl: null,
-                ReloadPageAfterModal: false,
-                ModalData: {
-                    Parameters: {},
-                    HelperFuncParameters: null,
-                    ResponseData: cryptoData
-                },
-                CloseFunction: null,
-                HelperFunction: null,
+    //Third arg is whether to fetch remember me token or not
+    //Fourth arg is whether to set results in ESSO cookies or not
+    WizSec.authenticate(username, password, true, true, function(resp) {
+        req.post(authUrl, {
+            body: JSON.stringify({
                 Parameters: {
-                    encrypted: encStr,
-                    rememberMe: false
+                    token: WizSec.authenticateEntity.getSAMLToken().SAMLTokenValue
                 }
-            };
-
-        //This thing wants form headers but a JSON body
-        req.post({
-            url: authUrl,
-            headers: {
-                'Content-type': 'application/x-www-form-urlencoded; charset=utf-8'
-            },
-            body: JSON.stringify(authForm)
+            }),
         }, function(error, resp, body) {
-            if(resp.statusCode == 200) {
-                callback(null, null);
-            } else {
-                //Non-2xx response code
-                callback('Failed to authenticate with WOTC', null);
-            }
+            callback(null, null);
         });
     });
 }

@@ -12,13 +12,14 @@
     "debug": "node --debug app.js"
   },
   "dependencies": {
-    "express": "*",
-    "body-parser": "*",
-    "jade": "*",
-
     "async": "*",
+    "body-parser": "*",
+    "express": "*",
+    "jade": "*",
+    "libxmljs": "^0.14.0",
     "mongoskin": "*",
     "nconf": "*",
+    "qs": "^2.4.1",
     "request": "*",
     "tough-cookie": "*",
     "underscore": "*"
