@@ -1,30 +1,9 @@
-/* global _, Ember*/
-require([
-    'require',
-    'ember',
-    'highcharts',
-    'bootstrap',
-    'lodash'
-], function(require) {
-    //Create app
-    window.MTGS = Ember.Application.create({
-        LOG_ACTIVE_GENERATION: true,
-        LOG_VIEW_LOOKUPS: true,
-        LOG_TRANSITIONS: true
-    });
+import _ from 'lodash';
+import highcharts from 'highcharts';
+import bootstrap from 'bootstrap';
+import Header from './header/header';
+import Charts from './charts/charts';
 
-    MTGS.deferReadiness();
-
-    require([
-        'controllers',
-        'templates',
-        'views'
-    ], function() {
-        MTGS.Router.map(function() {
-            this.resource('charts', { path: '/charts' });
-            this.resource('mana', { path: '/mana' });
-        });
-
-        MTGS.advanceReadiness();
-    });
-});
+//Init controls
+new Header('#header');
+new Charts('#charts');

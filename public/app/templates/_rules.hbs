@@ -1,9 +1,0 @@
-<div class="form-inline" style="margin-left:10px">
-    <div class="form-group">
-        {{view Ember.TextField valueBinding="view.content.count" class="form-control" placeholderBinding="view.content"}}
-        {{view Ember.Select valueBinding="view.content.color" content=MTGS.LandColors class="form-control"}}
-        by turn
-        {{view Ember.Select valueBinding="view.content.turn" content=MTGS.Turns class="form-control"}}
-        <button {{action deleteRule view.content}} class="btn btn-sm btn-danger">Delete</button>
-    </div>
-</div>

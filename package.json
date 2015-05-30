@@ -14,7 +14,7 @@
   "dependencies": {
     "async": "*",
     "body-parser": "*",
-    "express": "*",
+    "express": "^4.12.4",
     "jade": "*",
     "libxmljs": "^0.14.0",
     "mongoskin": "*",
@@ -23,5 +23,8 @@
     "request": "*",
     "tough-cookie": "*",
     "underscore": "*"
+  },
+  "devDependencies": {
+    "steal-tools": "^0.10.6"
   }
 }

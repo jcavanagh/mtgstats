@@ -17,14 +17,9 @@ var express = require('express'),
 var app = express();
 app.use(bodyParser());
 
-app.set('view engine', 'jade');
+//Serve the public dir and bower_components
 app.use(express.static(__dirname + '/public'));
-app.use('/vendor', express.static(__dirname + '/bower_components'));
-
-//App
-app.get('/', function(req, res, next) {
-    res.render('index');
-});
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 //Routes
 var loadRoutes = function(routes) {
