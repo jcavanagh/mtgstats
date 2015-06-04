@@ -1,4 +1,4 @@
-var stats = require('analytics/lib');
+var stats = require('analytics/analytics');
 
 function getCombos(items) {
     var combos = [];

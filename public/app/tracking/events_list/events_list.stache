@@ -1,0 +1,21 @@
+<div class="list-group eventsListContainer">
+	{{#events}}
+	<div class="list-group-item eventsListItem">
+		<div class="eventId">{{{eventId}}}</div>
+		<div class="eventDate">{{{eventDate}}}</div>
+		<div class="description">{{{description}}}</div>
+		<div class="location">{{{location}}}</div>
+		{{#results}}
+		<div class="resultsList">
+			{{#matches}}
+			<div class="resultsListItem">
+				<span class="round">{{round}}</span>. 
+				<span class="opponent">{{{opponent}}</span> - 
+				<span class="matchResult">{{result}}</span>
+			</div>
+			{{/matches}}
+		</div>
+		{{/results}}
+	</div>
+	{{/events}}
+</div>

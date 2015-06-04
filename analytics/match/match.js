@@ -1,22 +1,9 @@
 /* global _, exports */
-var db = require('db'),
-    nconf = require('nconf');
-
-var dciNumber = nconf.get('dciNumber');
+var db = require('db');
+var events = require('analytics/event/event');
+var nconf = require('nconf');
 
 //Generic things
-exports.getEvents = function(query, callback) {
-    //Optional query
-    if(_.isFunction(query)) {
-        callback = query;
-        query = {};
-    }
-
-    query.dciNumber = dciNumber;
-
-    db.find(query).toArray(callback);
-};
-
 exports.extractMatches = function(events) {
     var matches = _.reduce(events, function(memo, evt) {
         if(!evt.results) {
@@ -56,7 +43,7 @@ exports.extractMatchStats = function(matches) {
 
 //Event helpers
 exports.getEventsByFormat = function(callback) {
-    this.getEvents(function(err, events) {
+    events.getEvents(function(err, events) {
         var formatEvents = _.groupBy(events, function(evt) {
             return evt.results ? evt.results.format : 'Unknown';
         });
@@ -66,7 +53,7 @@ exports.getEventsByFormat = function(callback) {
 };
 
 exports.getEventsByOpponent = function(callback) {
-    this.getEvents(function(err, events) {
+    events.getEvents(function(err, events) {
         var oppEvents = {};
         _.each(events, function(evt) {
             if(evt.results) {
@@ -94,7 +81,7 @@ exports.getEventsByOpponent = function(callback) {
 //Match helpers
 exports.getAllMatchStats = function(callback) {
     var me = this;
-    me.getEvents(function(err, events) {
+    events.getEvents(function(err, events) {
         var stats = me.extractMatchStats(me.extractMatches(events));
 
         callback(err, stats);

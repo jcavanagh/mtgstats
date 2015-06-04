@@ -4,15 +4,15 @@ process.env.NODE_PATH = '.';
 require('module').Module._initPaths();
 
 //Global underscore
-GLOBAL._ = require('underscore');
+GLOBAL._ = require('lodash');
 
 //Nconf setup
 var nconf = require('nconf');
 nconf.file('config.json');
 
 //Express
-var express = require('express'),
-    bodyParser = require('body-parser');
+var express = require('express');
+var bodyParser = require('body-parser');
 
 var app = express();
 app.use(bodyParser());
@@ -28,11 +28,13 @@ var loadRoutes = function(routes) {
     });
 }
 
-var matchRoutes = require('routes/match'),  
-    manaRoutes = require('routes/mana');
+var matchRoutes = require('routes/match');
+var manaRoutes = require('routes/mana');
+var eventRoutes = require('routes/event');
 
 loadRoutes(matchRoutes);
 loadRoutes(manaRoutes);
+loadRoutes(eventRoutes);
 
 //Fire it up
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 8081);

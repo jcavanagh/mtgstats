@@ -29,6 +29,8 @@ var authUrl = 'http://www.wizards.com/Magic/PlaneswalkerPoints/Login/Login',
     eventsExp = new RegExp(
         //Event ID
         'data-summarykey="(\\d+)"[\\s\\S]+?' +
+        //Event Date
+        'HistoryPanelHeaderLabel Date">(.+?)<[\\s\\S]+?' +
         //Event Description
         'HistoryPanelHeaderLabel Description">(.+?)<[\\s\\S]+?' +
         //Event Location
@@ -64,8 +66,9 @@ function parseEvents(callback) {
             events.push({
                 dciNumber: dciNumber,
                 eventId: arr[1],
-                description: arr[2],
-                location: arr[3]
+                eventDate: arr[2],
+                description: arr[3],
+                location: arr[4]
             });
         }
 
@@ -91,13 +94,17 @@ function parseEvents(callback) {
 
                     //Parse matches
                     var matchArr;
+                    var round = 1;
                     while((matchArr = eventMatchDetailExp.exec(eventDetailData)) !== null) {
                         evt.results.matches.push({
+                            round: round,
                             result: matchArr[1].trim(),
                             points: matchArr[2].trim().replace(/[\(\)]/g,''),
                             opponent: matchArr[3].trim() || 'BYE',
                             format: evt.results.format
                         });
+
+                        round++;
                     }
                 }
 

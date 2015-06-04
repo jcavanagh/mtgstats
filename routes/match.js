@@ -1,5 +1,5 @@
-var wiz = require('data/match/wizards.js'),
-analytics = require('analytics/match/lib.js');
+var wiz = require('data/match/wizards.js')
+var match = require('analytics/match/match.js');
 
 module.exports = [{
     route: '/data/match/wizards',
@@ -27,7 +27,7 @@ module.exports = [{
     route: '/analytics/match/all',
     method: 'get',
     fn: function(req, res, next) {
-        analytics.getAllMatchStats(function(err, stats) {
+        match.getAllMatchStats(function(err, stats) {
             res.send({
                 error: err,
                 data: stats
@@ -38,7 +38,7 @@ module.exports = [{
     route: '/analytics/match/format',
     method: 'get',
     fn: function(req, res, next) {
-        analytics.getMatchStatsByFormat(function(err, stats) {
+        match.getMatchStatsByFormat(function(err, stats) {
             res.send({
                 error: err,
                 data: stats
@@ -49,7 +49,7 @@ module.exports = [{
     route: '/analytics/match/opponent',
     method: 'get',
     fn: function(req, res, next) {
-        analytics.getMatchStatsByOpponent(function(err, stats) {
+        match.getMatchStatsByOpponent(function(err, stats) {
             res.send({
                 error: err,
                 data: stats

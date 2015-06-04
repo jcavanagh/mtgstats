@@ -1,5 +1,7 @@
 import can from 'can';
-import template from './template';
+import template from './tracking.stache!';
+
+import EventsList from './events_list/events_list';
 
 export default can.Control.extend({
 	init: function() {
@@ -8,5 +10,7 @@ export default can.Control.extend({
 		});
 
 		this.element.html(template(viewModel));
+
+		new EventsList(this.element.find('.eventsList'));
 	}
 });

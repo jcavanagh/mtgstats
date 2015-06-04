@@ -1,5 +1,5 @@
 var lands = require('data/mana/lands'),
-    landMath = require('analytics/mana/lib');
+    landMath = require('analytics/mana/mana');
 
 module.exports = [{
     route: '/data/mana/lands',

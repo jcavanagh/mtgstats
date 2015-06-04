@@ -32,6 +32,9 @@ export default can.Control.extend({
 
             $('#matchStatsContainer').append('<div class="col-md-12"></div>');
             $('#matchStatsContainer > div:nth-of-type(1)').highcharts(_.extend(chartTemplate, {
+                title: {
+                    text: ''
+                },
                 series: [{
                     type: 'pie',
                     data: [
