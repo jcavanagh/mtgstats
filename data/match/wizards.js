@@ -112,6 +112,7 @@ function parseEvents(callback) {
                 mapCb(null, evt);
             });
         }, function(err, results) {
+            console.log('Events parsed! Results:', results.length)
             callback(err, results);
         });
     });
@@ -155,13 +156,13 @@ module.exports = {
     sync: function(callback) {
         var me = this;
 
-        db.remove({ dciNumber: dciNumber }, function(err, results) {
+        db.personal.remove({ dciNumber: dciNumber }, function(err, results) {
             if(err) {
                 console.log('Error removing records for ID:', dciNumber);
                 callback(err, []);
             } else {
                 me.get(function(err, results) {
-                    db.insert(results, function(err, results) {
+                    db.personal.insert(results, function(err, results) {
                         if(err) {
                             callback(err, 'Sync failed!');
                         } else {

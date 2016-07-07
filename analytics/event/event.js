@@ -13,5 +13,5 @@ exports.getEvents = function(query, callback) {
 
     query.dciNumber = dciNumber;
 
-    db.find(query).toArray(callback);
+    db.personal.find(query).toArray(callback);
 };

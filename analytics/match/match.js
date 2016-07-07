@@ -1,5 +1,4 @@
 /* global _, exports */
-var db = require('db');
 var events = require('analytics/event/event');
 var nconf = require('nconf');
 
