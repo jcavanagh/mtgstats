@@ -6,6 +6,7 @@ var host = nconf.get('DB_HOST') || 'localhost',
     db = mongo.db('mongodb://' + host + ':' + port + '/mtgstats');
 
 module.exports = {
-	personal: db.collection('mtgstats-personal'),
-	metagame: db.collection('mtgstats-metagame')
+	personal: db.collection('personal'),
+	metagame: db.collection('metagame'),
+	mtgstats: db.collection('mtgstats')
 };
