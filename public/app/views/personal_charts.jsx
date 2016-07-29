@@ -1,16 +1,12 @@
-/* global $,_ */
-import can from 'can/can';
-import template from './charts.stache!';
+import React from 'react';
 
 /**
  * Charts View
  * 
  * @author Joe Cavanagh
  */
-export default can.Control.extend({
-    init: function() {
-        this.element.html(template());
-
+export default class ChartsView extends React.Component {
+    componentWillMount() {
         var chartTemplate = {
             tooltip: {
                 pointFormat: '{point.percentage:.1f}%'
@@ -27,7 +23,7 @@ export default can.Control.extend({
         };
 
         //General match stats
-        $.get('/analytics/match/all', function(stats) {
+        $.get('/analytics/personal/all', function(stats) {
             var winData = stats.data;
 
             $('#matchStatsContainer').append('<div class="col-md-12"></div>');
@@ -48,7 +44,7 @@ export default can.Control.extend({
         });
 
         //Format match stats
-        $.get('/analytics/match/format', function(stats) {
+        $.get('/analytics/personal/format', function(stats) {
             var formatData = stats.data;
 
             //Sort by most-played formats
@@ -86,7 +82,7 @@ export default can.Control.extend({
         });
 
         //Opponent match stats
-        $.get('/analytics/match/opponent', function(stats) {
+        $.get('/analytics/personal/opponent', function(stats) {
             var opponentData = stats.data;
 
             //Sort by top X most-played opponents, filter single-match opponents
@@ -131,4 +127,41 @@ export default can.Control.extend({
             });
         });
     }
-});
+
+    render() {
+        return (
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Overall Match Statistics</h3>
+                        </div>
+                        <div id="matchStatsContainer" class="panel-body">
+                            <!-- Match stats charts generated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Format Statistics</h3>
+                        </div>
+                        <div id="formatStatsContainer" class="panel-body">
+                            <!-- Format stats charts generated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Opponent Statistics</h3>
+                        </div>
+                        <div id="opponentStatsContainer" class="panel-body">
+                            <!-- Opponent stats charts generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}

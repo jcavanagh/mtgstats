@@ -1,5 +1,5 @@
 var async = require('async'),
-    db = require('db'),
+    db = require('db/db'),
     fs = require('fs'),
     nconf = require('nconf'),
     req = require('request').defaults({ jar: true }),
