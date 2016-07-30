@@ -136,9 +136,7 @@ export default class ChartsView extends React.Component {
                         <div class="panel-heading">
                             <h3 class="panel-title">Overall Match Statistics</h3>
                         </div>
-                        <div id="matchStatsContainer" class="panel-body">
-                            <!-- Match stats charts generated here -->
-                        </div>
+                        <div id="matchStatsContainer" class="panel-body" />
                     </div>
                 </div>
                 <div class="row">
@@ -146,9 +144,7 @@ export default class ChartsView extends React.Component {
                         <div class="panel-heading">
                             <h3 class="panel-title">Format Statistics</h3>
                         </div>
-                        <div id="formatStatsContainer" class="panel-body">
-                            <!-- Format stats charts generated here -->
-                        </div>
+                        <div id="formatStatsContainer" class="panel-body" />
                     </div>
                 </div>
                 <div class="row">
@@ -156,9 +152,7 @@ export default class ChartsView extends React.Component {
                         <div class="panel-heading">
                             <h3 class="panel-title">Opponent Statistics</h3>
                         </div>
-                        <div id="opponentStatsContainer" class="panel-body">
-                            <!-- Opponent stats charts generated here -->
-                        </div>
+                        <div id="opponentStatsContainer" class="panel-body" />
                     </div>
                 </div>
             </div>

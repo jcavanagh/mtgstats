@@ -19,7 +19,6 @@ app.use(bodyParser());
 
 //Serve the public dir and bower_components
 app.use(express.static(__dirname + '/public'));
-app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 //Routes
 var loadRoutes = function(routes) {
@@ -29,12 +28,8 @@ var loadRoutes = function(routes) {
 }
 
 var matchRoutes = require('routes/match');
-var manaRoutes = require('routes/mana');
-var eventRoutes = require('routes/event');
 
 loadRoutes(matchRoutes);
-loadRoutes(manaRoutes);
-loadRoutes(eventRoutes);
 
 //Fire it up
 app.listen(process.env.PORT || 8081);
