@@ -24,10 +24,9 @@ class App extends React.Component {
 		return (
 			<Provider store={store}>
 				<Header />
-				<Charts />
 			</Provider>
 		);
 	}
 }
 
-ReactDOM.render(<App />, document.getElementById('#app'));
+ReactDOM.render(<App />, document.getElementById('app'));
